@@ -96,6 +96,41 @@ def get_employee_size(company_url):
     company_cache[company_url] = result
     return result
 
+def get_company_website(company_url):
+    """Fetch the company's official website from its LinkedIn page accurately."""
+    if not company_url or company_url == "N/A":
+        return "N/A"
+
+    html = safe_request(company_url)
+    if not html:
+        return "N/A"
+
+    soup = BeautifulSoup(html, "html.parser")
+
+    # 1️⃣ Try LinkedIn’s "Visit website" link (most reliable)
+    visit_link = soup.find("a", string=re.compile(r"Visit website", re.I))
+    if visit_link and visit_link.has_attr("href"):
+        return visit_link["href"]
+
+    # 2️⃣ Try link tags with possible "company website" keywords
+    possible_links = []
+    for a in soup.find_all("a", href=True):
+        href = a["href"].strip()
+        if href.startswith("http") and "linkedin.com" not in href:
+            possible_links.append(href)
+
+    # 3️⃣ Filter out unwanted URLs
+    blacklist = ["facebook.com", "twitter.com", "instagram.com", "youtube.com", "linkedin.com", "t.me"]
+    valid_links = [l for l in possible_links if not any(b in l.lower() for b in blacklist)]
+
+    # 4️⃣ Return the most likely company domain (shortest clean URL)
+    if valid_links:
+        valid_links.sort(key=len)
+        return valid_links[0]
+
+    return "N/A"
+
+
 # ------------------------- Classification -------------------------
 def detect_contract_type(title, desc):
     text = (title + " " + desc).lower()
@@ -163,15 +198,15 @@ def fetch_jobs(keyword, location, pages=PAGES):
 
                 description = extract_job_description(job_link)
                 email = extract_emails_from_html(description)
+                company_website = get_company_website(company_url)
                 emp_size = get_employee_size(company_url) if company_url != "N/A" else "N/A"
-
                 crawl_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 contract_type = detect_contract_type(title, description)
                 industry = detect_industry(title, description, company)
 
                 jobs.append([
                     title, company, city, rest[0], rest[1], post_time, job_link,
-                    email, description, "N/A", company_url, crawl_time,
+                    email, description, company_website, company_url, crawl_time,
                     contract_type, industry, emp_size
                 ])
             except Exception as e:

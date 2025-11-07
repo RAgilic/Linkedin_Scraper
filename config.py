@@ -4,8 +4,8 @@
 LI_AT = "AQEDAU0NCxMCXgIPAAABmjpbirkAAAGaXmgOuU0ABxQ7oETj7NUyfvKcaMITkqHlCXrjZQ06kxYe21QgyqwNiX4-c2J5z2blm0hcfjWc8PbR8nSXc2yJ4gcW48RZ61L9kcXkRVCpGChs6lHADK9FBVxm"
 
 KEYWORDS = ["ASP.NET Developer", "C# Developer", "Backend Developer"]
-LOCATION = ["Canada"]
-PAGES = 2
+LOCATION = ["Canada"]#,"UK","US"]
+PAGES = 20
 
 BASE_HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
